@@ -68,6 +68,10 @@ func Dialer(sc *Conn) func(network, address string) (net.Conn, error) {
 	}
 }
 
+func noRedirect(req *http.Request, via []*http.Request) error {
+	return http.ErrUseLastResponse
+}
+
 func NewClient() (*http.Client, *Conn) {
 	slowconn := &Conn{}
 
@@ -78,7 +82,8 @@ func NewClient() (*http.Client, *Conn) {
 	}
 
 	var client = &http.Client{
-		Transport: transport,
+		Transport:     transport,
+		CheckRedirect: noRedirect,
 	}
 
 	return client, slowconn
